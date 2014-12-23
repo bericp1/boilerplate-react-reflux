@@ -1,0 +1,30 @@
+{
+  "name": "groupr",
+  "version": "0.0.0",
+  "description": "Share with friends privately.",
+  "scripts": {
+    "start": "node server.js",
+    "postinstall": "gulp build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bericp1/groupr"
+  },
+  "author": "bericp1",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bericp1/groupr/issues"
+  },
+  "homepage": "https://github.com/bericp1/groupr",
+  "dependencies": {
+    "body-parser": "^1.10.0",
+    "browserify": "^7.0.3",
+    "es5-shim": "^4.0.5",
+    "express": "^4.10.6",
+    "extend": "^2.0.0",
+    "gulp": "^3.8.10",
+    "gulp-concat": "^2.4.2",
+    "gulp-uglify": "^1.0.2",
+    "vinyl-transform": "^1.0.0"
+  }
+}
