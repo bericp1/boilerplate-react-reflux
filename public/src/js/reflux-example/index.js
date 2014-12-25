@@ -33,8 +33,7 @@ module.exports = React.createClass({
       store: store.data
     };
   },
-  render: function(){
-    console.log(this, 'rendering');
+  renderPosts: function(){
     var posts = this.state.store.posts.map(function(post){
       return (
         <Post key={post.id} {...post} />
@@ -59,5 +58,28 @@ module.exports = React.createClass({
         </table>
       </div>
     );
+  },
+  renderMessage: function(message){
+    return (
+      <div>
+        <h2>Basic Reflux Test</h2>
+        <button onClick={actions.reloadPosts}>Reload</button>
+        <div><strong><em>{message}</em></strong></div>
+      </div>
+    );
+  },
+  render: function(){
+    switch(this.state.store.state){
+      case store.STATE_LOADING:
+        return this.renderMessage('Posts are loading...');
+      case store.STATE_ERR:
+        return this.renderMessage('There was an error loading posts: ' +
+          this.state.store.error);
+      case store.STATE_OK:
+        return this.renderPosts();
+      default:
+        console.error('Improper state on reflux-example/store:', this.state.store.state);
+        return this.renderMessage('An unknown error occurred.');
+    }
   }
 });

@@ -16,21 +16,21 @@ module.exports = Reflux.createStore({
           posts: data
         };
       }.bind(this))
-      .fail(function(){
+      .fail(function(err){
         this.data.state = this.STATE_ERR;
-        this.data.error = 'Could not fetch posts from server.';
+        this.data.error = 'Could not fetch posts from server';
+        if(err.responseJSON && err.responseJSON.error){
+          this.data.error += ': ' + err.responseJSON.error;
+        }else{
+          this.data.error += '.';
+        }
       }.bind(this))
       .always(function(){
         this.trigger(this.data);
       }.bind(this));
   },
   init: function(){
-    this.data = {
-      state: this.STATE_LOADING,
-      posts: []
-    };
-    this.trigger(this.data);
-    this.updateFromServer();
+    this.reloadPosts();
   },
   deletePost: function(postId){
     this.data.posts = this.data.posts.filter(function(post){
@@ -39,6 +39,11 @@ module.exports = Reflux.createStore({
     this.trigger(this.data);
   },
   reloadPosts: function(){
+    this.data = {
+      state: this.STATE_LOADING,
+      posts: []
+    };
+    this.trigger(this.data);
     this.updateFromServer();
   }
 });

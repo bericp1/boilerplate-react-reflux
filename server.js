@@ -10,6 +10,17 @@ module.exports = function(options){
 
   var logger = options.logger || console.info;
 
+  if(process.env.NODE_ENV === 'development')
+    app.use(function(req, res, next){
+      logger(req.method + ' ' + req.path);
+      next();
+    });
+
+  // Uncomment to simulate error
+  // app.use('/assets/posts.json', function(req, res, next){
+  //   res.status(500).send({error: 'This is a serverside error.'});
+  // });
+
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
 
