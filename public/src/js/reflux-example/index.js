@@ -29,7 +29,6 @@ module.exports = React.createClass({
   displayName: 'RefluxExample',
   mixins: [Reflux.connect(store, 'store')],
   getInitialState: function(){
-    console.log(this, 'getting initial state');
     return {
       store: store.data
     };
@@ -46,13 +45,17 @@ module.exports = React.createClass({
         <h2>Basic Reflux Test</h2>
         <button onClick={actions.reloadPosts}>Reload</button>
         <table>
+        <thead>
           <tr>
             <th>ID</th>
             <th>Title</th>
             <th>Body</th>
             <th>Actions</th>
           </tr>
+        </thead>
+        <tbody>
           {posts}
+        </tbody>
         </table>
       </div>
     );

@@ -1,15 +1,17 @@
 var gulp = require('gulp'),
+  gutil = require('gulp-util'),
   browserify = require('browserify'),
+  watchify = require('watchify'),
   reactify = require('reactify'),
   concat = require('gulp-concat'),
   uglify = require('gulp-uglify'),
-  transform = require('vinyl-transform'),
+  source = require('vinyl-source-stream'),
   extend = require('extend'),
   moulder = require('./lib/config-moulder');
 
 var environment = process.env.NODE_ENV || 'production';
 
-console.log('NODE_ENV:', process.env.NODE_ENV);
+gutil.log('NODE_ENV:', process.env.NODE_ENV);
 
 var defaults = {
   vendor: []
@@ -27,21 +29,38 @@ gulp.task('vendor', function(){
 
 });
 
-gulp.task('browserify', ['vendor'], function(){
+var bundler = browserify({
+  cache: {}, packageCache: {}, fullPaths: true,
+  transform: [reactify]
+});
+bundler.add('./public/src/js/app.js');
 
-  var browserified = transform(function(filename) {
-    return browserify(filename)
-      .transform(reactify)
-      .bundle();
-  });
-
-  var pipeline = gulp.src(['./public/src/js/app.js'])
-  .pipe(browserified);
+var bundle = function(bundler){
+  var pipeline = bundler.bundle().pipe(source('app.js'));
 
   if(environment === 'production')
     pipeline.pipe(uglify());
 
   return pipeline.pipe(gulp.dest('./public/dist'));
+};
+
+gulp.task('browserify', ['vendor'], function(){
+
+  return bundle(bundler);
+
+});
+
+gulp.task('serve', ['vendor', 'copy'], function(){
+
+  bundler = watchify(bundler);
+  bundler.on('update', function(){
+    bundle(bundler);
+    gutil.log('Rebundled since files changed');
+  });
+
+  require('./server')({logger:gutil.log});
+
+  return bundle(bundler);
 
 });
 
@@ -55,6 +74,6 @@ gulp.task('copy', function(){
 
 });
 
-gulp.task('build', ['browserify', 'copy']);
+gulp.task('build', ['copy', 'browserify']);
 
 gulp.task('default', ['build']);

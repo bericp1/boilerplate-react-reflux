@@ -1,16 +1,23 @@
-var express = require('express'),
-  app = express(),
-  bodyParser = require('body-parser');
+module.exports = function(options){
 
-var config = require('./config.js').server;
+  options = options || {};
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+  var express = require('express'),
+    app = express(),
+    bodyParser = require('body-parser');
 
-app.use(express.static(__dirname + '/public/dist'));
+  var config = require('./config.js').server;
 
-var port = process.env.PORT || config.port;
+  var logger = options.logger || console.info;
 
-app.listen(port, function(){
-  console.info('Serving on port:', port);
-});
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json());
+
+  app.use(express.static(__dirname + '/public/dist'));
+
+  var port = options.port || process.env.PORT || config.port;
+
+  app.listen(port, function(){
+    logger('Serving on port:', port);
+  });
+};
