@@ -1,5 +1,6 @@
 var gulp = require('gulp'),
   browserify = require('browserify'),
+  reactify = require('reactify'),
   concat = require('gulp-concat'),
   uglify = require('gulp-uglify'),
   transform = require('vinyl-transform'),
@@ -29,8 +30,9 @@ gulp.task('vendor', function(){
 gulp.task('browserify', ['vendor'], function(){
 
   var browserified = transform(function(filename) {
-    var b = browserify(filename);
-    return b.bundle();
+    return browserify(filename)
+      .transform(reactify)
+      .bundle();
   });
 
   var pipeline = gulp.src(['./public/src/js/app.js'])
