@@ -4,12 +4,21 @@ var React = require('react'),
 var store = require('./store'),
   actions = require('./actions');
 
+var ReactBootstrap = require('react-bootstrap'),
+  Button = ReactBootstrap.Button,
+  Glyphicon = ReactBootstrap.Glyphicon;
+
 var RefluxExampleHeading = React.createClass({
   render: function(){
     return (
       <div>
+        <Button
+          onClick={actions.reloadPosts}
+          bsStyle="info"
+          className="pull-right">
+            <Glyphicon glyph="refresh" /> Reload
+        </Button>
         <h2>Basic Reflux Test</h2>
-        <button onClick={actions.reloadPosts}>Reload</button>
       </div>
     );
   }
@@ -35,7 +44,9 @@ var Post = React.createClass({
         <td>{this.props.id}</td>
         <td>{this.props.title}</td>
         <td>{this.props.body}</td>
-        <td><button onClick={this.handleDelete}>delete</button></td>
+        <td><Button onClick={this.handleDelete} bsStyle="danger">
+          <Glyphicon glyph="trash" /> delete
+        </Button></td>
       </tr>
     );
   }
@@ -71,7 +82,7 @@ module.exports = React.createClass({
     return (
       <div>
         <RefluxExampleHeading />
-        <table>
+        <table className="table">
         <thead>
           <tr>
             <th>ID</th>
@@ -93,7 +104,7 @@ module.exports = React.createClass({
     return (
       <div>
         <RefluxExampleHeading />
-        <div><strong><em>{message}</em></strong></div>
+        <div className="text-primary text-center"><strong><em>{message}</em></strong></div>
       </div>
     );
   },

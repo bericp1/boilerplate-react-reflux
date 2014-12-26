@@ -1,5 +1,9 @@
 var React = require('react');
 
+var ReactBootstrap = require('react-bootstrap'),
+  Input = ReactBootstrap.Input,
+  Well = ReactBootstrap.Well;
+
 // Simple unrecommended way to save state between route changes.
 // A Reflux store should be used instead for the sake of expandability
 // and convention but this is just a simple demo for React.
@@ -21,7 +25,7 @@ module.exports = React.createClass({
   },
   // Updates the state and the variable to the value of the nested input
   updateName: function(){
-    name = this.refs.name.getDOMNode().value.trim();
+    name = this.refs.name.getValue().trim();
     this.setState({
       name: name
     });
@@ -32,11 +36,16 @@ module.exports = React.createClass({
     return (
       <div>
         <h2>Basic React Test</h2>
-        <div>
+        <Well>
           <strong>Hello</strong>, <em>{this.state.name}</em>!
-        </div>
+        </Well>
         <div>
-          <input type="text" placeholder="Enter name here" ref="name" onKeyUp={this.updateName} defaultValue={name} />
+          <Input
+            label="Name"
+            type="text"
+            ref="name"
+            onKeyUp={this.updateName}
+            defaultValue={name} />
         </div>
       </div>
     );
