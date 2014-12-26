@@ -6,18 +6,26 @@ var React = require('react'),
   NotFoundRoute = Router.NotFoundRoute,
   Redirect = Router.Redirect,
   RouteHandler = Router.RouteHandler,
-  Link = Router.Link;
+  Link = Router.Link,
+
+  ReactBootstrap = require('react-bootstrap'),
+  Nav = ReactBootstrap.Nav,
+
+  ReactRouterBootstrap = require('react-router-bootstrap'),
+  NavItemLink = ReactRouterBootstrap.NavItemLink,
+  ButtonLink = ReactRouterBootstrap.ButtonLink;
 
 // Build the root applicatino React view-controller
 var Application = React.createClass({
   render: function(){
     return (
-      <div>
+      <div className="container main-container">
         <header>
-          <h1>Test Page</h1>
-          <strong>Examples:</strong>
-          <Link to="react">React</Link>
-          <Link to="reflux">Reflux</Link>
+          <Nav bsStyle="pills" className="pull-right">
+            <NavItemLink to="react">React</NavItemLink>
+            <NavItemLink to="reflux">Reflux</NavItemLink>
+          </Nav>
+          <h1 className="text-muted">Test Page</h1>
         </header>
         <RouteHandler />
       </div>
