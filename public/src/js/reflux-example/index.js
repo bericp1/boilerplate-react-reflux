@@ -4,15 +4,31 @@ var React = require('react'),
 var store = require('./store'),
   actions = require('./actions');
 
+var RefluxExampleHeading = React.createClass({
+  render: function(){
+    return (
+      <div>
+        <h2>Basic Reflux Test</h2>
+        <button onClick={actions.reloadPosts}>Reload</button>
+      </div>
+    );
+  }
+});
+
+// Define a view-controller for a single post (row in a table)
 var Post = React.createClass({
+  // Enforce certain types for props of a post
   propTypes: {
     id: React.PropTypes.number.isRequired,
     title: React.PropTypes.string,
     body: React.PropTypes.string
   },
+  // Event handler for the deletion of this post
   handleDelete: function(){
+    // Call the deletePost action with this posts ID
     actions.deletePost(this.props.id);
   },
+  // Render out a table row (`<tr>`)
   render: function(){
     return (
       <tr>
@@ -25,24 +41,36 @@ var Post = React.createClass({
   }
 });
 
+// Create this compnonent's root view-controller and export it.
+// Notice the use of displayName. See [react-example](../react-example/index.js)
+// for an explanation.
 module.exports = React.createClass({
   displayName: 'RefluxExample',
+
+  // Connect this view-controller's state to our store so that when the store
+  // triggers, its payload will end up in this.state.store
   mixins: [Reflux.connect(store, 'store')],
+
   getInitialState: function(){
     return {
       store: store.data
     };
   },
+
+  // Returns a view-controller for showing the table of posts
   renderPosts: function(){
+    // We construct a new array of Post view-controllers from
+    // the post's meta data
     var posts = this.state.store.posts.map(function(post){
       return (
         <Post key={post.id} {...post} />
       );
     });
+    // Then show them in a table with a reload button that calls
+    // the reloadAction when clicked
     return (
       <div>
-        <h2>Basic Reflux Test</h2>
-        <button onClick={actions.reloadPosts}>Reload</button>
+        <RefluxExampleHeading />
         <table>
         <thead>
           <tr>
@@ -59,15 +87,18 @@ module.exports = React.createClass({
       </div>
     );
   },
+
+  // Renders a simple message instead of the posts table
   renderMessage: function(message){
     return (
       <div>
-        <h2>Basic Reflux Test</h2>
-        <button onClick={actions.reloadPosts}>Reload</button>
+        <RefluxExampleHeading />
         <div><strong><em>{message}</em></strong></div>
       </div>
     );
   },
+
+  // Render the full component based on the state of the store
   render: function(){
     switch(this.state.store.state){
       case store.STATE_LOADING:

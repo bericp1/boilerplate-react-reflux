@@ -1,3 +1,4 @@
+// Require libraries
 var React = require('react'),
   Reflux = require('reflux'),
   Router = require('react-router'),
@@ -7,25 +8,28 @@ var React = require('react'),
   RouteHandler = Router.RouteHandler,
   Link = Router.Link;
 
+// Build the root applicatino React view-controller
 var Application = React.createClass({
   render: function(){
     return (
       <div>
-      <header>
-      <h1>Test Page</h1>
-      <strong>Examples:</strong>
-      <Link to="react">React</Link>
-      <Link to="reflux">Reflux</Link>
-      </header>
-      <RouteHandler />
+        <header>
+          <h1>Test Page</h1>
+          <strong>Examples:</strong>
+          <Link to="react">React</Link>
+          <Link to="reflux">Reflux</Link>
+        </header>
+        <RouteHandler />
       </div>
     );
   }
 });
 
+// Require individual app components
 var ReactExample = require('./react-example'),
   RefluxExample = require('./reflux-example');
 
+// Define react-router routes
 var routes = (
   <Route name="app" path="/" handler={Application}>
     <Route name="react" handler={ReactExample} />
@@ -34,6 +38,8 @@ var routes = (
   </Route>
 );
 
+// Run the router
 Router.run(routes, function(Handler){
-  React.render(<Handler />, document.getElementById('app-root'));
+  // Render the root app view-controller
+  React.render(<Handler />, $('#app-root')[0]);
 });

@@ -2,92 +2,118 @@
 
 A simple, opinionated project boilerplate/seed.
 
-## Libraries
+## Libraries/Features
 
 ### Front-end
 
-  - **Component-view layer**
-    - [React](http://facebook.github.io/react/)
-  - **Uni-directional dataflow architecture**
-    - [Reflux](https://github.com/spoike/refluxjs)
-  - **Declaritive routing**
-    - [react-router](https://github.com/rackt/react-router/)
-  - **CommonJS module system**
-    - [browserify](http://browserify.org/)
-  - **Support for non-ES5 browsers**
-    - [es5-shim](https://github.com/es-shims/es5-shim)
-
+| Library                                                 | Purpose                               |
+| ------------------------------------------------------- | ------------------------------------- |
+| [React](http://facebook.github.io/react/)               | View-controller layer                  |
+| [Reflux](https://github.com/spoike/refluxjs)            | Uni-directional dataflow architecture |
+| [react-router](https://github.com/rackt/react-router/)  | Declarative routing                   |
+| [browserify](http://browserify.org/)                    | CommonJS module system                |
+| [es5-shim](https://github.com/es-shims/es5-shim)        | Support for non-ES5 clients           |
+| [jquery](http://jquery.com/)                            | For its utility methods (I'm *sorry*) |
 
 ### Back-end
 
-  - **Streaming build system**
-    - [gulp](http://gulpjs.com/)
-    - [gulp-uglify](https://www.npmjs.com/package/gulp-uglify)
-    - [browserify](http://browserify.org/)
-    - [reactify](https://github.com/andreypopp/reactify/)
-  - **Web app framework**
-    - [express v4](http://expressjs.com/)
-    - [body-parser](https://github.com/expressjs/body-parser)
+| Library                                                 | Purpose                            |
+| ------------------------------------------------------- | ---------------------------------- |
+| [express v4](http://expressjs.com/)                     | Web app framework and routing      |
+| [body-parser](https://github.com/expressjs/body-parser) | [Middleware] Request body parsing  |
+
+### Build Toolchain
+
+| Library                                                    | Purpose                               |
+| ---------------------------------------------------------- | ------------------------------------- |
+| [gulp](http://gulpjs.com/)                                 | Streaming build system                |
+| [gulp-uglify](https://www.npmjs.com/package/gulp-uglify)   | [Production] uglify js source         |
+| [gulp-util](https://github.com/gulpjs/gulp-util)           | Logging in gulp, etc.                 |
+| [gulp-concat](https://github.com/wearefractal/gulp-concat) | Concat'ing vendor scripts             |
+| [browserify](http://browserify.org/)                       | Bundling front-end CommonJS modules   |
+| vinyl-source-stream                                        | Make Browserify usable with gulp      |
+| [reactify](https://github.com/andreypopp/reactify/)        | A React/JSX transform for browserify  |
+| [watchify](https://github.com/substack/watchify)           | Efficient rebundling on changes       |
+
+## Build tasks
+
+### `$ gulp browserify`
+
+Bundles `public/src/app.js` with browserify and places it in
+`public/dist/app.js`.
+
+### `$ gulp serve` or `$ gulp dev`
+
+  1. runs `['vendor', 'copy']`
+  2. bundles `public/src/app.js` with browserify to `public/dist/app.js`
+  3. starts the server (`server.js`)
+  4. fires up watchify which will rebundle on changes to any bundled files.
+     Watchify uses a caching  system to make this a comparatively efficient
+     operation.
+
+### `$ gulp vendor`
+
+Concats all vendor scripts specified in `config.build[NODE_ENV].vendor` into
+`public/dist/vendor.js`
+
+### `$ gulp copy`
+
+Copies `public/{index.html,assets}` recursively to `public/dist` as is.
+
+### `$ gulp build`
+
+Should be used for building front end into public/dist where the server will
+serve from. Alias for `['copy', 'browserify']`.
 
 ## Structure/Architecture
 
-### Directories
+### Directories & Files
 
-  - `lib`: first-party, general node modules used on server side or in build
-    process
-  - `public`
-    - `src`: all front-end code
-      - `assets`: static files that don't need build processing
-      - `js`: all front-end common.js modules
-        - `app.js`: entry point
-      - `index.html`
-    - `dist`: post-build output; site is served from here
-      - `assets`: copied directly from `../src/assets`
-      - `app.js`: browserify bundle of `../src/app.js`
-      - `vendor.js`: concatenated third-party libraries
-      - `index.html`: copied directly from `../src/index.html`
-  - `config.js`: global configuration; see [below](#config)
-  - `server.js`: entry point for expressjs server
+    ├─ config.js                : app config
+    ├─ lib                      : first-party general node modules
+    ├─ public
+    │  ├─ dist                  : post-build output; served from here
+    │  └─ src                   : front-end code
+    │     ├─ assets             : static files; no build processing
+    │     ├─ index.html         : app entry; usually no need to edit
+    │     └─ js                 : all CommonJS modules for front-end
+    │        ├─ app.js          : entry; exports root view-controller
+    │        └─ [app-component] : a component of the app
+    │           ├─ index.js     : entry point; exports view-controller
+    │           ├─ actions.js   : Reflux actions for component
+    │           └─ store.js     : Reflux store for component
+    ├─ server.js                : entry point for express server
+    ├─ start.js                 : starts `server.js` with defaults
+    └─ config.js                : global app config; see [below](#config)
 
 ### Front-end
 
-**Notice**: This is all theory at this point. I'm not even sure it'll work this
-way.
-
 The front-end should be routed with `react-router`, utilizing `React` for the
-view-controller components, all tied together with `Reflux`, a library-backed
+view-controllers, all tied together with `Reflux`, a library-backed
 app architecture that relies on uni-directional data-flow and convention over
 configuration.
 
 The entry point for the front end (`public/src/app.js`) should...
 
-  - Build and render the root `Application` React component
-  - `require` each section appropriately (see below)
+  - Build and render the root `Application` React view-controller
+  - `require` each app component from their subdirs
   - describe the `react-router` routes
   - render the base application
 
-Preferably, each section of the front-end should...
-  - be separated into its own directory within `public/src/js/`
-  - be designated by the purpose it serves
+See the example: [app.js](public/src/js/app.js).
+
+Each app component should...
+  - be separated into its own subdir within `public/src/js/`
+  - be designated/named by the purpose it serves
   - have its own Reflux actions/stores and React view-controller(s)
-    - React view-controllers should live in separate `*.jsx` files
-    - stores in `*-store.js` files
-    - and actions in `*-actions.js` files
-  - likely have its own modules such as services for fetching server data
-  - export via `module.exports` in its `index.js` or other entry point its root
-    React view-component
+    - React view-controllers can live in separate `*.jsx` files or be rendered
+      in the app component's `index.js`
+    - stores in `*-store.js` or simply `store.js`
+    - and actions in `*-actions.js` or simply `actions.js`
+  - export via `module.exports` in its `index.js` its root React view-controller
 
-
-All front-end-related code goes in the `public/src` directory. The build process
-will...
-
-  1. Use browserify to bundle `public/src/app.js`
-    - `reactify` is used to transform JSX files
-  2. Place that bundle in `public/dist/app.js`
-    - And uglify it if `NODE_ENV` is `production`
-  3. Concat all third-party libraries listed in `config.build[NODE_ENV].vendor`
-  4. Output that to `public/dist/vendor.js`
-  5. Copy `public/src/index.html` and `public/src/assets` to `public/dist` as is
+See either example: [react-example](public/src/js/react-example) or
+[reflux-example](public/src/js/reflux-example)
 
 ### Back-end
 
@@ -104,26 +130,22 @@ the app.
 
 ## Config
 
-Located in [`config.js`](blob/master/config.js). The general structure and
-defaults are shown for each config section.
+Located in [`config.js`](config.js). Open up that file to see
+defaults and general structure.
 
-### `config.build`
+**Important**: Notice that the config can contain at its root two special
+properties: `production` and `development` which will override the other config
+options when the environment variable `NODE_ENV` is either `development` or
+`production`.
 
-There are two different sets of configuration `build.development` OR
-`build.production`. Which is used is determined explicitly by `NODE_ENV`.
+For example, if
 
-Both should have the exact same structure (defaults are shown as if `NODE_ENV`
-were `development`):
+    config.server.port === 8000
 
-    {
-      // All of the following scripts will
-      vendor: [
-        './node_modules/es5-shim/es5-shim.js'
-      ]
-    }
+but
 
-### `config.server`
+    config.production.server.port === 80 && process.env.NODE_ENV === 'production'
 
-    {
-      port: 8000
-    }
+then 80 will be favored by `server.js` over 8000. As a side note though,
+`server.js` by default prefers the port passed directly to it via its options,
+then the `PORT` environment variable, and finally `config.server.port`.

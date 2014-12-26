@@ -2,17 +2,28 @@ module.exports = function(options){
 
   options = options || {};
 
+  // Require third-party libs and instantiate app
   var express = require('express'),
     app = express(),
-    bodyParser = require('body-parser');
+    bodyParser = require('body-parser'),
 
-  var config = require('./config.js').server;
+    // Detect environment
+    environment = process.env.NODE_ENV || 'production',
 
-  var logger = options.logger || console.info;
+    // Load app config and mould it to environment
+    moulder = require('./lib/config-moulder'),
+    config = moulder(require('./config'), environment).server,
 
-  if(process.env.NODE_ENV === 'development')
+    port = options.port || process.env.PORT || config.port;
+
+  // Decide which logging interface to use.
+  // Attach it to `app` so that required route modules, etc. can use it
+  app.logger = options.logger || console.info;
+
+  // If in a dev environment, enable verbose logging for incoming requests
+  if(environment === 'development')
     app.use(function(req, res, next){
-      logger(req.method + ' ' + req.path);
+      app.logger(req.method + ' ' + req.path);
       next();
     });
 
@@ -21,14 +32,15 @@ module.exports = function(options){
   //   res.status(500).send({error: 'This is a serverside error.'});
   // });
 
+  // Body-parsing middleware
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
 
+  // Serve static files from `public/dist`
   app.use(express.static(__dirname + '/public/dist'));
 
-  var port = options.port || process.env.PORT || config.port;
-
+  // Fire up on `port`
   app.listen(port, function(){
-    logger('Serving on port:', port);
+    app.logger('Serving on port:', port);
   });
 };
