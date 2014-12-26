@@ -6,7 +6,8 @@ var store = require('./store'),
 
 var ReactBootstrap = require('react-bootstrap'),
   Button = ReactBootstrap.Button,
-  Glyphicon = ReactBootstrap.Glyphicon;
+  Glyphicon = ReactBootstrap.Glyphicon,
+  Table = ReactBootstrap.Table;
 
 var RefluxExampleHeading = React.createClass({
   render: function(){
@@ -82,7 +83,7 @@ module.exports = React.createClass({
     return (
       <div>
         <RefluxExampleHeading />
-        <table className="table">
+        <Table>
         <thead>
           <tr>
             <th>ID</th>
@@ -94,7 +95,7 @@ module.exports = React.createClass({
         <tbody>
           {posts}
         </tbody>
-        </table>
+        </Table>
       </div>
     );
   },
