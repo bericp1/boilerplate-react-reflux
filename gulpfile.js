@@ -3,6 +3,8 @@ var gulp = require('gulp'),
   gutil = require('gulp-util'),
   concat = require('gulp-concat'),
   uglify = require('gulp-uglify'),
+  sass = require('gulp-sass'),
+  cssmin = require('gulp-cssmin'),
 
   // For Browserify compat
   buffer = require('vinyl-buffer'),
@@ -27,9 +29,9 @@ config = moulder(config, environment).build;
 // Concat vendor scripts (described in config)
 gulp.task('vendor', function(){
 
-  if(config.vendor.length === 0) return;
+  if(config.vendor.js.length === 0) return;
 
-  return gulp.src(config.vendor)
+  return gulp.src(config.vendor.js)
     .pipe(concat('vendor.js'))
     .pipe(gulp.dest('./public/dist'));
 
@@ -42,7 +44,7 @@ var bundler = browserify({
 });
 
 // Add the entry module to the bundler
-bundler.add('./public/src/js/app.js');
+bundler.add('./public/src/scripts/app.js');
 
 // Actually use bundler to perform bundling
 // Can be called indefinitely throughout bulid
@@ -66,15 +68,40 @@ gulp.task('browserify', ['vendor'], function(){
 
 });
 
+// Task to compile scss to css
+gulp.task('sass', function(){
+  var pipeline = gulp.src('./public/src/styles/app.scss')
+    .pipe(sass({
+      includePaths: config.vendor.scss || []
+    }))
+    .on('error', function(err){
+      gutil.log('Error in sass build:');
+      gutil.log(err);
+    });
+
+  if(environment === 'production')
+    pipeline.pipe(cssmin());
+
+  return pipeline.pipe(gulp.dest('./public/dist'));
+});
+
 // Wraps bundler with watchify to watch changes to bundled
-// files and rebundles as necessary. Also starts `server.js`.
-gulp.task('serve', ['vendor', 'copy'], function(){
+// files, watches sass scripts, watches statics to copy and
+// starts `server.js`.
+gulp.task('serve', ['vendor', 'copy', 'sass'], function(){
 
   bundler = watchify(bundler);
   bundler.on('update', function(){
     bundle(bundler);
     gutil.log('Rebundling...');
   });
+
+  gulp.watch('./public/src/styles/**/*.*', ['sass']);
+
+  gulp.watch(
+    ['./public/src/index.html', './public/src/assets/**/*.*'],
+    ['copy']
+  );
 
   require('./server')({logger:gutil.log});
 
@@ -97,5 +124,5 @@ gulp.task('copy', function(){
 });
 
 // For deployment. Makes front-end ready to serve from `public/dist`
-gulp.task('build', ['copy', 'browserify']);
+gulp.task('build', ['copy', 'browserify', 'sass']);
 gulp.task('default', ['build']);

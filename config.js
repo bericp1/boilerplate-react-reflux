@@ -1,7 +1,15 @@
 module.exports = {
   build: {
-    // Will be concated and included in index.html before app bundle
-    vendor: []
+    vendor: {
+      // Will be concated and included in index.html before app bundle.
+      js: [],
+      // Will be included as an includePath for @import statements
+      scss: [
+        // Bootstrap is included by default and can be used with
+        // `@import "bootstrap"`
+        './node_modules/bootstrap-sass/assets/stylesheets'
+      ]
+    }
   },
   server: {
     // Port to run on. Overridden by PORT env variable or port passed as an
@@ -11,19 +19,25 @@ module.exports = {
   // Merges into config if NODE_ENV is development
   development: {
     build: {
-      vendor: [
-        './node_modules/es5-shim/es5-shim.js',
-        './node_modules/jquery/dist/jquery.js'
-      ]
+      vendor: {
+        js: [
+          './node_modules/es5-shim/es5-shim.js',
+          './node_modules/jquery/dist/jquery.js',
+          './node_modules/bootstrap/dist/js/bootstrap.js'
+        ]
+      }
     }
   },
   // Merges into config if NODE_ENV is production
   production: {
     build: {
-      vendor: [
+      vendor: {
+        js: [
         './node_modules/es5-shim/es5-shim.min.js',
-        './node_modules/jquery/dist/jquery.min.js'
-      ]
+        './node_modules/jquery/dist/jquery.min.js',
+        './node_modules/bootstrap/dist/js/bootstrap.min.js'
+        ]
+      }
     }
   }
 };

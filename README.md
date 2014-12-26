@@ -8,12 +8,13 @@ A simple, opinionated project boilerplate/seed.
 
 | Library                                                 | Purpose                               |
 | ------------------------------------------------------- | ------------------------------------- |
-| [React](http://facebook.github.io/react/)               | View-controller layer                  |
+| [React](http://facebook.github.io/react/)               | View-controller layer                 |
 | [Reflux](https://github.com/spoike/refluxjs)            | Uni-directional dataflow architecture |
 | [react-router](https://github.com/rackt/react-router/)  | Declarative routing                   |
 | [browserify](http://browserify.org/)                    | CommonJS module system                |
 | [es5-shim](https://github.com/es-shims/es5-shim)        | Support for non-ES5 clients           |
 | [jquery](http://jquery.com/)                            | For its utility methods (I'm *sorry*) |
+| sass/scss                                               | A CSS preprocessor                    |
 
 ### Back-end
 
@@ -30,6 +31,8 @@ A simple, opinionated project boilerplate/seed.
 | [gulp-uglify](https://www.npmjs.com/package/gulp-uglify)   | [Production] uglify js source         |
 | [gulp-util](https://github.com/gulpjs/gulp-util)           | Logging in gulp, etc.                 |
 | [gulp-concat](https://github.com/wearefractal/gulp-concat) | Concat'ing vendor scripts             |
+| [gulp-sass](https://www.npmjs.com/package/gulp-sass)       | For processing sass/scss into css     |
+| [gulp-cssmin](https://www.npmjs.com/package/gulp-cssmin)   | [Production] minify css               |
 | [browserify](http://browserify.org/)                       | Bundling front-end CommonJS modules   |
 | vinyl-source-stream                                        | Make Browserify usable with gulp      |
 | [reactify](https://github.com/andreypopp/reactify/)        | A React/JSX transform for browserify  |
@@ -39,31 +42,41 @@ A simple, opinionated project boilerplate/seed.
 
 ### `$ gulp browserify`
 
-Bundles `public/src/app.js` with browserify and places it in
+Bundles `public/src/scripts/app.js` with browserify and places it in
 `public/dist/app.js`.
+
+### `$ gulp sass`
+
+Processes `public/src/styles/app.scss` into CSS and places it in
+`public/dist/app.css`. This means that all styles will be compiled into one
+file (minified in production) and must be `@import`ed somewhere down the line
+starting form `app.scss`. **Partials (`_*.scss`) are your friends.**
 
 ### `$ gulp serve` or `$ gulp dev`
 
-  1. runs `['vendor', 'copy']`
-  2. bundles `public/src/app.js` with browserify to `public/dist/app.js`
+  1. runs `['vendor', 'copy', 'sass']`
+  2. bundles `public/src/scripts/app.js` with browserify to `public/dist/app.js`
   3. starts the server (`server.js`)
   4. fires up watchify which will rebundle on changes to any bundled files.
      Watchify uses a caching  system to make this a comparatively efficient
      operation.
+  5. watches for changes to `public/src/styles/**/*.*` and runs `sass` task
+  6. watches for changes to static files (`public/src/{index.html,assets/}`)
+     and runs `copy` task
 
 ### `$ gulp vendor`
 
-Concats all vendor scripts specified in `config.build[NODE_ENV].vendor` into
+Concats all vendor scripts specified in `config.build.vendor.js` into
 `public/dist/vendor.js`
 
 ### `$ gulp copy`
 
-Copies `public/{index.html,assets}` recursively to `public/dist` as is.
+Copies `public/src/{index.html,assets}` recursively to `public/dist` as is.
 
 ### `$ gulp build`
 
 Should be used for building front end into public/dist where the server will
-serve from. Alias for `['copy', 'browserify']`.
+serve from. Alias for `['copy', 'browserify', 'sass']`.
 
 ## Structure/Architecture
 
@@ -76,7 +89,9 @@ serve from. Alias for `['copy', 'browserify']`.
     │  └─ src                   : front-end code
     │     ├─ assets             : static files; no build processing
     │     ├─ index.html         : app entry; usually no need to edit
-    │     └─ js                 : all CommonJS modules for front-end
+    │     ├─ styles             : all sass/scss styles for the frontend
+    |     |  └─app.scss         : entry for styles; use @import here
+    │     └─ scripts            : all CommonJS modules for front-end
     │        ├─ app.js          : entry; exports root view-controller
     │        └─ [app-component] : a component of the app
     │           ├─ index.js     : entry point; exports view-controller
@@ -93,17 +108,17 @@ view-controllers, all tied together with `Reflux`, a library-backed
 app architecture that relies on uni-directional data-flow and convention over
 configuration.
 
-The entry point for the front end (`public/src/app.js`) should...
+The entry point for the front end (`public/src/scripts/app.js`) should...
 
   - Build and render the root `Application` React view-controller
   - `require` each app component from their subdirs
   - describe the `react-router` routes
   - render the base application
 
-See the example: [app.js](public/src/js/app.js).
+See the example: [app.js](public/src/scripts/app.js).
 
 Each app component should...
-  - be separated into its own subdir within `public/src/js/`
+  - be separated into its own subdir within `public/src/scripts/`
   - be designated/named by the purpose it serves
   - have its own Reflux actions/stores and React view-controller(s)
     - React view-controllers can live in separate `*.jsx` files or be rendered
@@ -112,8 +127,8 @@ Each app component should...
     - and actions in `*-actions.js` or simply `actions.js`
   - export via `module.exports` in its `index.js` its root React view-controller
 
-See either example: [react-example](public/src/js/react-example) or
-[reflux-example](public/src/js/reflux-example)
+See either example: [react-example](public/src/scripts/react-example) or
+[reflux-example](public/src/scripts/reflux-example)
 
 ### Back-end
 
