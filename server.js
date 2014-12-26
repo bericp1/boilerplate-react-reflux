@@ -41,6 +41,7 @@ module.exports = function(options){
 
   // Fire up on `port`
   app.listen(port, function(){
+    app.logger('Detected environment:', environment);
     app.logger('Serving on port:', port);
   });
 };
