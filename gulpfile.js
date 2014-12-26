@@ -5,6 +5,7 @@ var gulp = require('gulp'),
   uglify = require('gulp-uglify'),
 
   // For Browserify compat
+  buffer = require('vinyl-buffer'),
   source = require('vinyl-source-stream'),
 
   //Browserify module, watch wrapper, and JSX transform
@@ -47,7 +48,10 @@ bundler.add('./public/src/js/app.js');
 // Can be called indefinitely throughout bulid
 // process to rebundle.
 var bundle = function(bundler){
-  var pipeline = bundler.bundle().pipe(source('app.js'));
+  var pipeline = bundler
+    .bundle()
+    .pipe(source('app.js'))
+    .pipe(buffer());
 
   if(environment === 'production')
     pipeline.pipe(uglify());
