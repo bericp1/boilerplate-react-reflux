@@ -40,7 +40,11 @@ gulp.task('vendor', function(){
 // Create a browserify instance with proper options
 var bundler = browserify({
   cache: {}, packageCache: {}, fullPaths: true,
-  transform: [reactify]
+  transform: [reactify],
+  paths: [
+    './node_modules',
+    './public/src/lib'
+  ]
 });
 
 // Add the entry module to the bundler

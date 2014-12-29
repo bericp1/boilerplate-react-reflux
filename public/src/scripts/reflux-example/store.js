@@ -1,5 +1,6 @@
 var Reflux = require('reflux'),
-  actions = require('./actions');
+  actions = require('./actions'),
+  $ = require('jquery');
 
 // Export a new Reflux store
 module.exports = Reflux.createStore({

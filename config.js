@@ -14,7 +14,10 @@ module.exports = {
   server: {
     // Port to run on. Overridden by PORT env variable or port passed as an
     // option to server.js
-    port: 8000
+    port: 8000,
+    // The URI to use to connect to the app's mongodb. Overridden by MONGOLAB_URI
+    // env variable
+    mongodbURI: 'mongodb://localhost/test'
   },
   // Merges into config if NODE_ENV is development
   development: {

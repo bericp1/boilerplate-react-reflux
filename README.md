@@ -123,8 +123,8 @@ Each app component should...
   - have its own Reflux actions/stores and React view-controller(s)
     - React view-controllers can live in separate `*.jsx` files or be rendered
       in the app component's `index.js`
-    - stores in `*-store.js` or simply `store.js`
-    - and actions in `*-actions.js` or simply `actions.js`
+    - stores in `*.store.js` or simply `store.js`
+    - and actions in `actions.js`
   - export via `module.exports` in its `index.js` its root React view-controller
 
 See either example: [react-example](public/src/scripts/react-example) or
