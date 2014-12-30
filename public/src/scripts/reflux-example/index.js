@@ -1,71 +1,26 @@
 var React = require('react'),
   Reflux = require('reflux');
 
-var store = require('./store'),
-  actions = require('./actions');
+var store = require('./store');
 
 var ReactBootstrap = require('react-bootstrap'),
   Button = ReactBootstrap.Button,
   Glyphicon = ReactBootstrap.Glyphicon,
   Table = ReactBootstrap.Table;
 
-var RefluxExampleHeading = React.createClass({
-  render: function(){
-    return (
-      <div>
-        <Button
-          onClick={actions.reloadPosts}
-          bsStyle="info"
-          className="pull-right">
-            <Glyphicon glyph="refresh" /> Reload
-        </Button>
-        <h2>Basic Reflux Test</h2>
-      </div>
-    );
-  }
-});
+// We split up the component into parts; let's require those
+var RefluxExampleHeading = require('./heading.jsx'),
+  Post = require('./post.jsx');
 
-// Define a view-controller for a single post (row in a table)
-var Post = React.createClass({
-  // Enforce certain types for props of a post
-  propTypes: {
-    id: React.PropTypes.number.isRequired,
-    title: React.PropTypes.string,
-    body: React.PropTypes.string
-  },
-  // Event handler for the deletion of this post
-  handleDelete: function(){
-    // Call the deletePost action with this posts ID
-    actions.deletePost(this.props.id);
-  },
-  // Render out a table row (`<tr>`)
-  render: function(){
-    return (
-      <tr>
-        <td>{this.props.id}</td>
-        <td>{this.props.title}</td>
-        <td>{this.props.body}</td>
-        <td><Button onClick={this.handleDelete} bsStyle="danger">
-          <Glyphicon glyph="trash" /> delete
-        </Button></td>
-      </tr>
-    );
-  }
-});
-
-// Create this compnonent's root view-controller and export it.
-// Notice the use of displayName. See [react-example](../react-example/index.js)
-// for an explanation.
-module.exports = React.createClass({
-  displayName: 'RefluxExample',
-
+var RefluxExample = React.createClass({
   // Connect this view-controller's state to our store so that when the store
   // triggers, its payload will end up in this.state.store
   mixins: [Reflux.connect(store, 'store')],
 
+  // Pull initial state from store
   getInitialState: function(){
     return {
-      store: store.data
+      store: store.getData()
     };
   },
 
@@ -126,3 +81,5 @@ module.exports = React.createClass({
     }
   }
 });
+
+module.exports = RefluxExample;

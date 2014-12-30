@@ -9,13 +9,8 @@ var ReactBootstrap = require('react-bootstrap'),
 // and convention but this is just a simple demo for React.
 var name = 'friend';
 
-// Export a react view-controller
-module.exports = React.createClass({
-  // Its necessary to include a displayName or create the React class on a
-  // named variable and then export that variable. Otherwise, the view-
-  // controller will be identified as `exports` which will likely cause
-  // cause conflicts with other classes if you forget to do this for them.
-  displayName: 'ReactExample',
+// Create a react view-controller
+var ReactExample = React.createClass({
   // Called whenever the route is changed to the one associated with this
   // view-controller. We'll load the variable-stored name into the state.
   getInitialState: function(){
@@ -51,3 +46,6 @@ module.exports = React.createClass({
     );
   }
 });
+
+// Export ot
+module.exports = ReactExample;

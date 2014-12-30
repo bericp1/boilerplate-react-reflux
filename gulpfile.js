@@ -42,10 +42,7 @@ var bundler = browserify({
   cache: {}, packageCache: {}, fullPaths: true,
   transform: [reactify],
   debug: (environment === 'development'),
-  paths: [
-    './node_modules',
-    './public/src/lib'
-  ]
+  paths: config.browserifyPaths
 });
 
 // Add the entry module to the bundler

@@ -4,9 +4,9 @@ var React = require('react'),
 var NoteItem = require('./note-item.jsx');
 
 var store = require('./note.store'),
-  actions = require('./actions');
+  actions = require('./note.actions');
 
-var genTag = require('random-string');
+var genTag = require('lib/random-string');
 
 var NoteList = React.createClass({
   mixins: [Reflux.ListenerMixin],

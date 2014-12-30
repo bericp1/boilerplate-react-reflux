@@ -4,18 +4,18 @@ var React = require('react'),
 
 var noteStore = require('./note.store'),
   noteFormStore = require('./note-form.store'),
-  noteActions = require('./actions'),
+  noteActions = require('./note.actions'),
   noteFormActions = require('./note-form.actions');
 
-var genTag = require('random-string');
+var genTag = require('lib/random-string');
 
 var NoteForm = React.createClass({
   mixins: [Reflux.ListenerMixin, Reflux.connect(noteFormStore)],
 
   getInitialState: function(){
     return {
-      title: '',
-      body: '',
+      title: noteFormStore.getTitle(),
+      body: noteFormStore.getBody(),
       tag: genTag(),
       error: false,
       message: false,
@@ -52,7 +52,6 @@ var NoteForm = React.createClass({
 
   componentDidMount: function(){
     this.listenTo(noteStore, this.checkResponse);
-    noteFormActions.load();
   },
 
   handleSubmit: function(event){

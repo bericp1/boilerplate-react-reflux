@@ -15,12 +15,16 @@ module.exports = Reflux.createStore({
     note.body = body;
   },
 
-  onSave: function(title, body){
-    this.setNote(title, body);
-    this.trigger(note);
+  getTitle: function(){
+    return note.title;
   },
 
-  onLoad: function(){
+  getBody: function(){
+    return note.body;
+  },
+
+  onSave: function(title, body){
+    this.setNote(title, body);
     this.trigger(note);
   }
 });

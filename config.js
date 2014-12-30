@@ -9,7 +9,11 @@ module.exports = {
         // `@import "bootstrap"`
         './node_modules/bootstrap-sass/assets/stylesheets'
       ]
-    }
+    },
+    browserifyPaths: [
+      './public/src',
+      './node_modules'
+    ]
   },
   server: {
     // Port to run on. Overridden by PORT env variable or port passed as an

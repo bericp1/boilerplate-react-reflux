@@ -6,9 +6,9 @@ var React = require('react'),
   Button = ReactBootstrap.Button;
 
 var store = require('./note.store'),
-  actions = require('./actions');
+  actions = require('./note.actions');
 
-var genTag = require('random-string');
+var genTag = require('lib/random-string');
 
 var NoteItem = React.createClass({
   propTypes: {

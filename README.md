@@ -173,6 +173,10 @@ For SCSS styles, its recommended to have a separate `*.scss` file in
 prefixes (perhaps separated form the rest of the class name with a double dash
 `--`) to avoid naming conflicts.
 
+**Important:** `public/src/` is added to the browserify search path so you can
+`require` modules relative to that path such as `require('lib/my-lib')` for
+convenience.
+
 ### Back-end
 
 Note that the back-end is much more free-from and flexible but these are my

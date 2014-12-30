@@ -1,6 +1,6 @@
 var Reflux = require('reflux'),
-  actions = require('./actions'),
-  extractError = require('extract-jquery-ajax-error');
+  actions = require('./note.actions'),
+  extractError = require('lib/extract-jquery-ajax-error');
 
 var state = {
   notes: [],
