@@ -2,55 +2,88 @@ var React = require('react'),
   Reflux = require('reflux'),
   Input = require('react-bootstrap').Input;
 
-var store = require('./note.store'),
-  actions = require('./actions');
+var noteStore = require('./note.store'),
+  noteFormStore = require('./note-form.store'),
+  noteActions = require('./actions'),
+  noteFormActions = require('./note-form.actions');
+
+var genTag = require('random-string');
 
 var NoteForm = React.createClass({
-  mixins: [Reflux.ListenerMixin],
-
-  componentDidMount: function(){
-    this.listenTo(store, function(payload){
-      this.setState({
-        loading: (payload.state === store.STATE_LOADING)
-      });
-    });
-  },
+  mixins: [Reflux.ListenerMixin, Reflux.connect(noteFormStore)],
 
   getInitialState: function(){
     return {
-      error: '',
+      title: '',
+      body: '',
+      tag: genTag(),
+      error: false,
+      message: false,
       loading: false
     }
   },
 
-  reset: function(){
-    this.refs.title.getInputDOMNode().value = '';
-    this.refs.body.getInputDOMNode().value = '';
-    this.setState({
-      error: ''
-    });
+  componentWillUnmount: function(){
+    noteFormActions.save(
+      this.refs.title.getValue(),
+      this.refs.body.getValue()
+    );
+  },
+
+  checkResponse: function(){
+    var state = {loading: noteStore.awaiting(this.state.tag)};
+
+    if(!state.loading && noteStore.responded(this.state.tag)){
+      var response = noteStore.claim(this.state.tag);
+      if(response.success){
+        state.title = '';
+        state.body = '';
+        state.error = false;
+        state.message = 'Successfully added note: "' + response.data.title + '"';
+      }else{
+        state.message = false;
+        state.error = 'Error adding note. ' + response.err;
+      }
+      state.tag = genTag();
+    }
+
+    this.setState(state);
+  },
+
+  componentDidMount: function(){
+    this.listenTo(noteStore, this.checkResponse);
   },
 
   handleSubmit: function(event){
     event.preventDefault();
     if(this.state.loading) return;
-    actions.addNote(
+    noteActions.addNote(
+      this.state.tag,
       this.refs.title.getValue(),
-      this.refs.body.getValue(),
-      function(err){
-        if(err){
-          this.setState({error: err});
-        }else{
-          this.reset();
-        }
-      }.bind(this)
+      this.refs.body.getValue()
     );
   },
+
+
+  handleChange: function(){
+    this.setState({
+      message: false,
+      error: false,
+      title: this.refs.title.getValue(),
+      body: this.refs.body.getValue()
+    });
+  },
+
   render: function(){
     return (
       <div>
         <h2>Add a Note</h2>
-        <div className="text-center text-danger"><strong>{this.state.error}</strong></div>
+        <div className="text-center text-danger">
+          <strong>{this.state.error}</strong>
+        </div>
+        <div className="text-center text-success">
+          <strong>{this.state.message}</strong>
+        </div>
         <form onSubmit={this.handleSubmit}>
           <Input
             type="text"
@@ -58,6 +91,8 @@ var NoteForm = React.createClass({
             placeholder="Title"
             ref="title"
             disabled={this.state.loading}
+            value={this.state.title}
+            onChange={this.handleChange}
           />
           <Input
             type="textarea"
@@ -65,6 +100,8 @@ var NoteForm = React.createClass({
             placeholder="This is the body."
             ref="body"
             disabled={this.state.loading}
+            value={this.state.body}
+            onChange={this.handleChange}
           />
           <Input type="submit"
             value={this.state.loading ? 'Adding...' : 'Add'}

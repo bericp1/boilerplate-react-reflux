@@ -18,6 +18,7 @@ var getAll = function(req, res){
 };
 
 var deleteOne = function(req, res){
+  //setTimeout(function(){res.status(500).send({error: 'Testing.'})},2000);
   if(!req.body || !req.body.id){
     res.status(400).send({error: 'A note must be specified to be deleted.'});
   }else{
@@ -26,7 +27,7 @@ var deleteOne = function(req, res){
         res.status(500).send({error: 'There was an error with the database.'});
         console.error(err);
       }else{
-        getAll(req, res);
+        res.send(note);
       }
     });
   }
@@ -50,7 +51,7 @@ var addOne = function(req, res){
 
 router.get('/', getAll);
 router.get('/all', getAll);
-router.post('/delete', deleteOne);
-router.post('/add', addOne);
+router.delete('/', deleteOne);
+router.post('/', addOne);
 
 module.exports = router;

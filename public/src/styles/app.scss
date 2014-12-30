@@ -19,26 +19,30 @@ header {
     text-align: left;
     display: inline-block;
     width: 300px;
-//    border: 1px solid #a3a3a3;
-//    -webkit-box-shadow: 0px 10px 16px 0px rgba(50, 50, 50, 0.75);
-//    -moz-box-shadow:    0px 10px 16px 0px rgba(50, 50, 50, 0.75);
-//    box-shadow:         0px 10px 16px 0px rgba(50, 50, 50, 0.75);
+    //    border: 1px solid #a3a3a3;
+    //    -webkit-box-shadow: 0px 10px 16px 0px rgba(50, 50, 50, 0.75);
+    //    -moz-box-shadow:    0px 10px 16px 0px rgba(50, 50, 50, 0.75);
+    //    box-shadow:         0px 10px 16px 0px rgba(50, 50, 50, 0.75);
     margin: 15px;
-//    padding: 8px;
-//
-//    .note-title {
-//      font-weight: bold;
-//      font-size: 2em;
-    }
+    //    padding: 8px;
+    //
+    //    .note-title {
+    //      font-weight: bold;
+    //      font-size: 2em;
 
-    .note-created {
-      font-style: italic;
-      font-size: .8em;
-      color: #a3a3a3;
+    &.note-loading {
+      opacity: 0.5;
     }
+  }
 
-    .note-body {
-      margin: 16px 0;
-    }
-//  }
+  .note-created {
+    font-style: italic;
+    font-size: .8em;
+    color: #a3a3a3;
+  }
+
+  .note-body {
+    margin: 16px 0;
+  }
+  //  }
 }

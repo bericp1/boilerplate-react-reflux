@@ -26,6 +26,7 @@ module.exports = {
         js: [
           './node_modules/es5-shim/es5-shim.js',
           './node_modules/jquery/dist/jquery.js',
+          './public/src/lib/ajax-put-delete.jquery.js',
           './node_modules/bootstrap/dist/js/bootstrap.js'
         ]
       }
@@ -38,6 +39,7 @@ module.exports = {
         js: [
         './node_modules/es5-shim/es5-shim.min.js',
         './node_modules/jquery/dist/jquery.min.js',
+          './public/src/lib/ajax-put-delete.jquery.min.js',
         './node_modules/bootstrap/dist/js/bootstrap.min.js'
         ]
       }

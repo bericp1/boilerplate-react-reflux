@@ -3,51 +3,61 @@ var React = require('react'),
 
 var NoteItem = require('./note-item.jsx');
 
-var store = require('./note.store');
+var store = require('./note.store'),
+  actions = require('./actions');
+
+var genTag = require('random-string');
 
 var NoteList = React.createClass({
-  mixins: [Reflux.connect(store, 'store')],
+  mixins: [Reflux.ListenerMixin],
+
   getInitialState: function(){
     return {
-      store: store.data
-    };
-  },
-  render: function(){
-    var content;
-    switch(this.state.store.state){
-      case store.STATE_OK:
-        var items = this.state.store.notes.map(function(note){
-          return (
-            <NoteItem key={note._id} {...note} />
-          );
-        });
-        content = (
-          <div className="note-list">
-          {items}
-          </div>
-        );
-        break;
-      case store.STATE_ERR:
-        content = (
-          <div className="text-center text-danger">
-            Something went wrong: <strong>{this.state.store.error}</strong>
-          </div>
-        );
-        break;
-      default:
-      case store.STATE_LOADING:
-        content = (
-          <div className="text-center text-info">
-            <strong>Loading...</strong>
-          </div>
-        );
-        break;
+      notes: [],
+      tag: genTag(),
+      loading: false,
+      error: false
     }
+  },
+
+  checkResponse: function(payload){
+    var state = {loading: store.awaiting(this.state.tag)};
+
+    if(!state.loading && store.responded(this.state.tag)){
+      var response = store.claim(this.state.tag);
+      if(response.success){
+        state.error = false;
+      }else{
+        state.error = 'Error reloading notes. ' + response.err;
+      }
+      state.tag = genTag();
+    }
+
+    state.notes = payload.notes;
+
+    this.setState(state);
+  },
+
+  componentDidMount: function(){
+    this.listenTo(store, this.checkResponse);
+    actions.reloadNotes(this.state.tag);
+  },
+
+  render: function(){
+    var notes = this.state.notes.map(function(note){
+      return (
+        <NoteItem key={note._id} {...note} />
+      );
+    });
+
+    if(notes.length === 0) notes = false;
 
     return (
       <div>
         <h2>All Notes</h2>
-        {content}
+        <div className="text-center text-danger"><strong>{this.state.error}</strong></div>
+        <div className="text-center text-primary"><strong>{this.state.loading ? 'Loading...' : false}</strong></div>
+        <div className="note-list">{notes}</div>
       </div>
     );
   }
