@@ -58,17 +58,14 @@ var bundle = function(bundler){
   var pipeline = bundler
     .bundle();
 
-  if(environment === 'development')
-    pipeline.on('error', function(err){
-      gutil.log('Error in bundle:');
-      gutil.log(err.stack);
-    });
+  if(typeof bundler.errHandler === 'function')
+    pipeline = pipeline.on('error', bundler.errHandler);
 
-  pipeline.pipe(source('app.js'))
+  pipeline = pipeline.pipe(source('app.js'))
     .pipe(buffer());
 
   if(environment === 'production')
-    pipeline.pipe(uglify());
+    pipeline = pipeline.pipe(uglify());
 
   return pipeline.pipe(gulp.dest('./public/dist'));
 };
@@ -92,7 +89,7 @@ gulp.task('sass', function(){
     });
 
   if(environment === 'production')
-    pipeline.pipe(cssmin());
+    pipeline = pipeline.pipe(cssmin());
 
   return pipeline.pipe(gulp.dest('./public/dist'));
 });
@@ -103,10 +100,15 @@ gulp.task('sass', function(){
 gulp.task('serve', ['vendor', 'copy', 'sass'], function(){
 
   bundler = watchify(bundler);
-  bundler.on('update', function(){
-    bundle(bundler);
-    gutil.log('Rebundling...');
-  });
+  bundler.errHandler = function(err){
+    gutil.log('Error in bundle:');
+    gutil.log(err.stack);
+  };
+  bundler
+    .on('update', function(){
+      bundle(bundler);
+      gutil.log('Rebundling...');
+    });
 
   gulp.watch('./public/src/styles/**/*.*', ['sass']);
 

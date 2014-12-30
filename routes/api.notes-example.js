@@ -2,7 +2,7 @@ var express = require('express'),
   Router = express.Router,
 
   mongoose = require('mongoose'),
-  Note = require('../models/note-example');
+  Note = require('../models/note-example.model');
 
 var router = Router();
 

@@ -14,6 +14,10 @@ var NoteItem = React.createClass({
     body: React.PropTypes.string
   },
 
+  handleDelete: function(){
+    actions.deleteNote(this.props._id);
+  },
+
   render: function(){
     this.created = new Date(this.props.created).toString();
 
@@ -21,7 +25,7 @@ var NoteItem = React.createClass({
       <Panel header={this.props.title + ' (' + this.props._id + ')'} className="note">
         <div className="note-created">{this.created}</div>
         <div className="note-body">{this.props.body}</div>
-        <Button onClick={actions.deleteNote.bind(actions.deleteNote, this.props._id)} bsStyle="danger" block>
+        <Button onClick={this.handleDelete} bsStyle="danger" block>
           <Glyphicon glyph="trash" /> Delete
         </Button>
       </Panel>

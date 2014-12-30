@@ -22,10 +22,11 @@ A simple, opinionated project boilerplate/seed.
 | ------------------------------------------------------- | ---------------------------------- |
 | [express v4](http://expressjs.com/)                     | Web app framework and routing      |
 | [body-parser](https://github.com/expressjs/body-parser) | [Middleware] Request body parsing  |
+| [mongoose](http://mongoosejs.com/)                      | MongoDB object modeling            |
 
 ### Build Toolchain
 
-| Library                                                    | Purpose                               |
+| Library/Service                                            | Purpose                               |
 | ---------------------------------------------------------- | ------------------------------------- |
 | [gulp](http://gulpjs.com/)                                 | Streaming build system                |
 | [gulp-uglify](https://www.npmjs.com/package/gulp-uglify)   | [Production] uglify js source         |
@@ -37,6 +38,34 @@ A simple, opinionated project boilerplate/seed.
 | vinyl-source-stream                                        | Make Browserify usable with gulp      |
 | [reactify](https://github.com/andreypopp/reactify/)        | A React/JSX transform for browserify  |
 | [watchify](https://github.com/substack/watchify)           | Efficient rebundling on changes       |
+| [Heroku](https://heroku.com)                               | Easy deployment (must add `mongolab`) |
+
+
+## Getting Started
+
+First off...
+
+    $ git clone https://github.com/bericp1/boilerplate-react-reflux.git app-name
+    $ cd app-name
+    $ git remote remove origin # Remove the boilerplate as the origin
+                               # You can optionally rename the remote
+
+If you plan on deploying to heroku, also run the commands in the
+[deployment](#deployment) section below.
+
+In general, you build React components and their associated Reflux stores and
+actions in separate directories within `public/src/scripts/`, `require` and use
+them in `public/src/app.js` to build the root front-end app.
+
+SASS styles go in `public/src/styles/` in `*.scss` files which then can be
+`@import`ed into the entry stylesheet `public/src/styles/app.scss`.
+
+Static files can go in `public/src/assets/`.
+
+The compiled front-end is outputted to `public/dist/` from which it is served.
+
+Server logic goes in `server.js` and separate express `Router`s in `routes/`,
+which can use mongoose models deined in `models/` for persistent storage.
 
 ## Build tasks
 
@@ -82,24 +111,32 @@ serve from. Alias for `['copy', 'browserify', 'sass']`.
 
 ### Directories & Files
 
-    ├─ config.js                : app config
-    ├─ lib                      : first-party general node modules
-    ├─ public
-    │  ├─ dist                  : post-build output; served from here
-    │  └─ src                   : front-end code
-    │     ├─ assets             : static files; no build processing
-    │     ├─ index.html         : app entry; usually no need to edit
-    │     ├─ styles             : all sass/scss styles for the frontend
-    |     |  └─app.scss         : entry for styles; use @import here
-    │     └─ scripts            : all CommonJS modules for front-end
-    │        ├─ app.js          : entry; exports root view-controller
-    │        └─ [app-component] : a component of the app
-    │           ├─ index.js     : entry point; exports view-controller
-    │           ├─ actions.js   : Reflux actions for component
-    │           └─ store.js     : Reflux store for component
-    ├─ server.js                : entry point for express server
-    ├─ start.js                 : starts `server.js` with defaults
-    └─ config.js                : global app config; see [below](#config)
+**Note:** These are all mostly just suggestions. Use whatever structure
+you feel comfortable with. Just note that this structure is what I had in mind
+while putting together this bootstrap.
+
+    ├─ config.js                 : app config
+    ├─ lib/                      : first-party general node modules
+    ├─ public/
+    │  ├─ dist/                  : post-build output; served from here
+    │  └─ src/                   : front-end code
+    │     ├─ assets/             : static files; no build processing
+    │     ├─ index.html          : app entry; usually no need to edit
+    │     ├─ styles/             : all sass/scss styles for the frontend
+    │     │  └─app.scss          : entry for styles; use @import here
+    │     ├─ lib/                : re-usable modules for front-end
+    │     └─ scripts/            : all CommonJS modules for front-end
+    │        ├─ app.js           : entry; exports root view-controller
+    │        └─ [app-component]/ : a component of the app
+    │           ├─ index.js      : entry point; exports view-controller
+    │           ├─ actions.js    : Reflux actions for component
+    │           ├─ store.js      : Reflux store for component
+    │           └─ my-view.jsx   : A related React view-component
+    ├─ server.js                 : entry point for express server
+    ├─ start.js                  : starts `server.js` with defaults
+    ├─ routes/                   : modules that export an express `Router`
+    ├─ models/                   : modules that export mongoose models
+    └─ config.js                 : global app config; see [below](#config)
 
 ### Front-end
 
@@ -130,18 +167,48 @@ Each app component should...
 See either example: [react-example](public/src/scripts/react-example) or
 [reflux-example](public/src/scripts/reflux-example)
 
+For SCSS styles, its recommended to have a separate `*.scss` file in
+`public/styles` for each app component which can then be `@import`ed into
+`app.scss`. For naming classes, its recommended to use component specific
+prefixes (perhaps separated form the rest of the class name with a double dash
+`--`) to avoid naming conflicts.
+
 ### Back-end
 
-There's no explicit structure for the server side. It may be neatest to create a
-`routes` directory to enforce some sort of structure and to abstract away as
-much as possible into modules that can be placed in `lib`.
+Note that the back-end is much more free-from and flexible but these are my
+formal suggestions when it comes to structure/architecture.
+
+#### Routing
+
+Create individual modules in `routes/` that export express `Router`s. It is
+recommended for the sake of organization to use file names/paths that directly
+correlate to the mount path of each `Router`.
+
+For example, if we're mounting an api endpoint to access posts at `/api/posts`,
+you might want to create the route in the file `routes/api.posts.js` or
+`routes/api/posts.js`. I personally prefer the former.
+
+#### Mongoose
+
+Mongoose is included in this bootstrap. I would recommend exporting mongoose
+models in modules in the `models/` directory so that they can be included by
+routes on an as-needed bases without having to access mongoose's internal
+model registry-thing.
 
 ## Deployment
 
-Ready to deploy to Heroku. `package.json` is configured with the correct `start`
-script so that `Procfile` is auto-generated and the correct `postinstall`
-script so that `gulp build` is run when a new commit is pushed live, building
-the app.
+Ready to deploy to Heroku after the `mongolab` addon is added to the heroku
+app along with the proper `NODE_ENV` environment variable:
+
+    $ heroku apps:create app-name
+    $ heroku config:set NODE_ENV=production
+    $ heroku addons:add mongolab
+    $ git push heroku master
+
+`package.json` is configured with the correct `start` script so that `Procfile`
+is auto-generated and the correct `postinstall` script so that `gulp build` is
+run when a new commit is pushed live, building the app. The port to run on
+and the URI to use to access mongodb will also be properly detected.
 
 ## Config
 
