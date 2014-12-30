@@ -13,17 +13,10 @@ var NoteItem = React.createClass({
     created: React.PropTypes.number,
     body: React.PropTypes.string
   },
-  calcDate: function(){
-    this.created = new Date(this.props.created).toString();
-  },
-  componentWillReceiveProps: function(){
-    this.calcDate();
-  },
-  componentWillMount: function(){
-    this.calcDate();
-  },
 
   render: function(){
+    this.created = new Date(this.props.created).toString();
+
     return (
       <Panel header={this.props.title + ' (' + this.props._id + ')'} className="note">
         <div className="note-created">{this.created}</div>
