@@ -41,6 +41,7 @@ gulp.task('vendor', function(){
 var bundler = browserify({
   cache: {}, packageCache: {}, fullPaths: true,
   transform: [reactify],
+  debug: (environment === 'development'),
   paths: [
     './node_modules',
     './public/src/lib'
@@ -55,8 +56,15 @@ bundler.add('./public/src/scripts/app.js');
 // process to rebundle.
 var bundle = function(bundler){
   var pipeline = bundler
-    .bundle()
-    .pipe(source('app.js'))
+    .bundle();
+
+  if(environment === 'development')
+    pipeline.on('error', function(err){
+      gutil.log('Error in bundle:');
+      gutil.log(err.stack);
+    });
+
+  pipeline.pipe(source('app.js'))
     .pipe(buffer());
 
   if(environment === 'production')
@@ -80,7 +88,7 @@ gulp.task('sass', function(){
     }))
     .on('error', function(err){
       gutil.log('Error in sass build:');
-      gutil.log(err);
+      gutil.log(err.stack);
     });
 
   if(environment === 'production')
