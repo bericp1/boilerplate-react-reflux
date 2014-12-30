@@ -52,6 +52,7 @@ var NoteForm = React.createClass({
 
   componentDidMount: function(){
     this.listenTo(noteStore, this.checkResponse);
+    noteFormActions.load();
   },
 
   handleSubmit: function(event){
