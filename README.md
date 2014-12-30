@@ -113,7 +113,7 @@ serve from. Alias for `['copy', 'browserify', 'sass']`.
 
 **Note:** These are all mostly just suggestions. Use whatever structure
 you feel comfortable with. Just note that this structure is what I had in mind
-while putting together this bootstrap.
+while putting together this boilerplate.
 
     ├─ config.js                 : app config
     ├─ lib/                      : first-party general node modules
@@ -194,7 +194,7 @@ you might want to create the route in the file `routes/api.posts.js` or
 
 #### Mongoose
 
-Mongoose is included in this bootstrap. I would recommend exporting mongoose
+Mongoose is included in this boilerplate. I would recommend exporting mongoose
 models in modules in the `models/` directory so that they can be included by
 routes on an as-needed bases without having to access mongoose's internal
 model registry-thing.

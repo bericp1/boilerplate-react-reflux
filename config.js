@@ -10,6 +10,7 @@ module.exports = {
         './node_modules/bootstrap-sass/assets/stylesheets'
       ]
     },
+    // Browserify will search through these paths for `requires`
     browserifyPaths: [
       './public/src',
       './node_modules'
