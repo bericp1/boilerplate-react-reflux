@@ -65,7 +65,8 @@ Static files can go in `public/src/assets/`.
 The compiled front-end is outputted to `public/dist/` from which it is served.
 
 Server logic goes in `server.js` and separate express `Router`s in `routes/`,
-which can use mongoose models deined in `models/` for persistent storage.
+which are required and mounted in `server.js` and can use mongoose models
+defined in `models/` for persistent storage.
 
 ## Build tasks
 
@@ -85,7 +86,7 @@ starting form `app.scss`. **Partials (`_*.scss`) are your friends.**
 
   1. runs `['vendor', 'copy', 'sass']`
   2. bundles `public/src/scripts/app.js` with browserify to `public/dist/app.js`
-  3. starts the server (`server.js`)
+  3. starts the server (`index.js`)
   4. fires up watchify which will rebundle on changes to any bundled files.
      Watchify uses a caching  system to make this a comparatively efficient
      operation.
@@ -132,8 +133,9 @@ while putting together this boilerplate.
     │           ├─ actions.js    : Reflux actions for component
     │           ├─ store.js      : Reflux store for component
     │           └─ my-view.jsx   : A related React view-component
-    ├─ server.js                 : entry point for express server
-    ├─ start.js                  : starts `server.js` with defaults
+    ├─ index.js                  : pre-configures the server
+    ├─ server.js                 : this is where routers can be required, etc.
+    ├─ start.js                  : starts server (from `index.js`) with defaults
     ├─ routes/                   : modules that export an express `Router`
     ├─ models/                   : modules that export mongoose models
     └─ config.js                 : global app config; see [below](#config)
@@ -182,6 +184,29 @@ convenience.
 Note that the back-end is much more free-from and flexible but these are my
 formal suggestions when it comes to structure/architecture.
 
+First off, the server is initially split into three different files:
+
+  - `index.js`: Pre-configures the server; contains boilerplate; exports a
+    function which when called (with a single, optional, overloading `config`
+    argument) does the following:
+    1. loads express and mongoose
+    2. creates an express `app`
+    3. detects environment
+    4. determines port to run on
+    5. determines mongodb URI
+    6. attaches a logging interface to `app.logger`
+    7. configures and mounts `body-parser`
+    8. requires `server.js` and calls it, passing the `app`
+    9. finally mounts a static file server that serves from `public/dist`
+    10. fires up mongodb connection
+    11. begins serving on determined port once mongoose has connected
+  - `server.js`: App-specific back-end logic; exports a function which takes a
+    required `app` argument which is the root express app. Inside this function
+    you should `require` and mount your routes/`Router`s.
+  - `start.js`: Used by the build toolchain to start the app quickly with the
+    default configuration. So you can run `node ./start.js` to fire up the
+    server if you'd like.
+
 #### Routing
 
 Create individual modules in `routes/` that export express `Router`s. It is
@@ -190,7 +215,8 @@ correlate to the mount path of each `Router`.
 
 For example, if we're mounting an api endpoint to access posts at `/api/posts`,
 you might want to create the route in the file `routes/api.posts.js` or
-`routes/api/posts.js`. I personally prefer the former.
+`routes/api/posts.js`. I personally prefer the former in order to keep a flatter
+directory structure that's still pretty descriptive.
 
 #### Mongoose
 
@@ -232,6 +258,6 @@ but
 
     config.production.server.port === 80 && process.env.NODE_ENV === 'production'
 
-then 80 will be favored by `server.js` over 8000. As a side note though,
-`server.js` by default prefers the port passed directly to it via its options,
+then 80 will be favored by `index.js` over 8000. As a side note though,
+`index.js` by default prefers the port passed directly to it via its options,
 then the `PORT` environment variable, and finally `config.server.port`.

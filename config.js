@@ -18,11 +18,14 @@ module.exports = {
   },
   server: {
     // Port to run on. Overridden by PORT env variable or port passed as an
-    // option to server.js
+    // option to index.js
     port: 8000,
     // The URI to use to connect to the app's mongodb. Overridden by MONGOLAB_URI
     // env variable
-    mongodbURI: 'mongodb://localhost/test'
+    mongodbURI: 'mongodb://localhost/test',
+    // Enable verbose logging on incoming requests? (If this creates a bottle-
+    // neck, it's recommended to only enable this in development)
+    verbose: true
   },
   // Merges into config if NODE_ENV is development
   development: {

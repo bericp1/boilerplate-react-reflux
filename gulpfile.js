@@ -93,7 +93,7 @@ gulp.task('sass', function(){
 
 // Wraps bundler with watchify to watch changes to bundled
 // files, watches sass scripts, watches statics to copy and
-// starts `server.js`.
+// starts `index.js`.
 gulp.task('serve', ['vendor', 'copy', 'sass'], function(){
 
   bundler = watchify(bundler);
@@ -114,7 +114,7 @@ gulp.task('serve', ['vendor', 'copy', 'sass'], function(){
     ['copy']
   );
 
-  require('./server')({logger:gutil.log});
+  require('./')({logger:gutil.log});
 
   return bundle(bundler);
 
