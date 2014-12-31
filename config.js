@@ -10,11 +10,33 @@ module.exports = {
         './node_modules/bootstrap-sass/assets/stylesheets'
       ]
     },
-    // Browserify will search through these paths for `requires`
-    browserifyPaths: [
-      './public/src',
-      './node_modules'
-    ]
+    browserify: {
+      // Browserify will search through these paths for `require`s
+      paths: [
+        './public/src',
+        './node_modules'
+      ],
+      // Will append source maps if true (Generally overridden in production
+      // config as `false`)
+      debug: true
+    },
+    // Will be rimraffed before builds and whatnot on a task-required basis
+    clean: {
+      // Before copy task...
+      copy: ['./public/dist/assets', './public/dist/index.html'],
+      // Before scripts task...
+      scripts: ['./public/dist/app.js'],
+      // Before styles task...
+      styles: ['./public/dist/app.css'],
+      // Before vendor task...
+      vendor: ['./public/dist/vendor.js']
+    },
+    // Minify css after built from scss? (Generally overridden in production
+    // config as `true`)
+    cssmin: false,
+    // Uglify js after bundle? (Generally overridden in production config as
+    // `true`)
+    uglify: false
   },
   server: {
     // Port to run on. Overridden by PORT env variable or port passed as an
@@ -50,6 +72,11 @@ module.exports = {
           './public/src/lib/ajax-put-delete.jquery.min.js',
         './node_modules/bootstrap/dist/js/bootstrap.min.js'
         ]
+      },
+      cssmin: true,
+      uglify: true,
+      browserify: {
+        debug: false
       }
     }
   }

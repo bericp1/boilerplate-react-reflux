@@ -70,21 +70,37 @@ defined in `models/` for persistent storage.
 
 ## Build tasks
 
-### `$ gulp browserify`
+### `$ gulp clean:[task]`
 
-Bundles `public/src/scripts/app.js` with browserify and places it in
-`public/dist/app.js`.
+Recursively removes (rimrafs) all files related to the task `task` as configured
+in `config.build.clean[task]`
 
-### `$ gulp sass`
+### `$ gulp scripts`
 
-Processes `public/src/styles/app.scss` into CSS and places it in
-`public/dist/app.css`. This means that all styles will be compiled into one
-file (minified in production) and must be `@import`ed somewhere down the line
-starting form `app.scss`. **Partials (`_*.scss`) are your friends.**
+Runs `['clean:scripts']` and then bundles `public/src/scripts/app.js` with
+browserify and places it in `public/dist/app.js`.
+
+### `$ gulp styles`
+
+Runs `['clean:styles']` and then processes `public/src/styles/app.scss` into CSS
+and places it in `public/dist/app.css`. This means that all styles will be
+compiled into one file (minified in production) and must be `@import`ed
+somewhere down the line starting form `app.scss`. **Partials (`_*.scss`) are
+your friends.**
+
+### `$ gulp vendor`
+
+Runs `['clean:vendor']` and then concats all vendor scripts specified in
+`config.build.vendor.js` into `public/dist/vendor.js`
+
+### `$ gulp copy`
+
+Runs `['clean:copy']` and then copies `public/src/{index.html,assets}`
+recursively to `public/dist` as is.
 
 ### `$ gulp serve` or `$ gulp dev`
 
-  1. runs `['vendor', 'copy', 'sass']`
+  1. runs `['vendor', 'copy', 'styles']`
   2. bundles `public/src/scripts/app.js` with browserify to `public/dist/app.js`
   3. starts the server (`index.js`)
   4. fires up watchify which will rebundle on changes to any bundled files.
@@ -94,19 +110,10 @@ starting form `app.scss`. **Partials (`_*.scss`) are your friends.**
   6. watches for changes to static files (`public/src/{index.html,assets/}`)
      and runs `copy` task
 
-### `$ gulp vendor`
-
-Concats all vendor scripts specified in `config.build.vendor.js` into
-`public/dist/vendor.js`
-
-### `$ gulp copy`
-
-Copies `public/src/{index.html,assets}` recursively to `public/dist` as is.
-
 ### `$ gulp build`
 
 Should be used for building front end into public/dist where the server will
-serve from. Alias for `['copy', 'browserify', 'sass']`.
+serve from. Alias for `['copy', 'scripts', 'styles']`.
 
 ## Structure/Architecture
 
@@ -133,6 +140,7 @@ while putting together this boilerplate.
     │           ├─ actions.js    : Reflux actions for component
     │           ├─ store.js      : Reflux store for component
     │           └─ my-view.jsx   : A related React view-component
+    ├─ tasks/                    : Gulp tasks; `require`d in `gulpfile.js`
     ├─ index.js                  : pre-configures the server
     ├─ server.js                 : this is where routers can be required, etc.
     ├─ start.js                  : starts server (from `index.js`) with defaults
