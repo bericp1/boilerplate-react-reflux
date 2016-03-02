@@ -46,6 +46,8 @@ module.exports = function(options){
 
   // Better error handling (custom 404s, etc)
 
+  app.logger('mongodb URI', mongodbURI);
+
   mongoose
     // Connect to mongodb
     .connect(mongodbURI)

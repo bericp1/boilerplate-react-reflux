@@ -12,9 +12,7 @@ var React = require('react'),
 
   ReactRouterBootstrap = require('react-router-bootstrap'),
   NavItemLink = ReactRouterBootstrap.NavItemLink,
-  ButtonLink = ReactRouterBootstrap.ButtonLink,
-
-  $ = require('jquery');
+  ButtonLink = ReactRouterBootstrap.ButtonLink;
 
 // Build the root applicatino React view-controller
 var Application = React.createClass({
